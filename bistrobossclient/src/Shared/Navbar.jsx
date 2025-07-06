@@ -1,17 +1,39 @@
-import React from 'react';
-import { NavLink } from 'react-router-dom';
+import React, { useContext } from 'react';
+import { Link, NavLink } from 'react-router-dom';
+import { AuthContext } from '../pages/AuthProvider/AuthProvider';
+import { FiShoppingCart } from "react-icons/fi";
 
 const Navbar = () => {
+    const { user, logOut } = useContext(AuthContext);
+
+
+
+     const handleLogOut = () => {
+        logOut()
+            .then(() => { })
+            .catch(error => console.log(error));
+    }
+
 
     const link= <>
     <li><NavLink to='/'>Home</NavLink></li>
     <li><NavLink to='/menu'>Menu</NavLink></li>
     <li><NavLink to='/order'>Order</NavLink></li>
+    <li><NavLink to='/login'>Login</NavLink></li>
+    <li><NavLink to='/signup'>SignUP</NavLink></li>
+
+
+    <li><NavLink to='/'><button className="btn">
+      <FiShoppingCart></FiShoppingCart>
+   <div className="badge badge-sm badge-secondary">+99</div>
+</button></NavLink></li>
  
        
-        <li><a>Item 3</a></li>
+    
 
     </>
+
+  
 
     return (
        <div className="navbar bg-black/30 fixed z-10   text-white shadow-sm">
@@ -34,7 +56,17 @@ const Navbar = () => {
     </ul>
   </div>
   <div className="navbar-end">
-    <a className="btn">Button</a>
+
+    {
+            user ? <>
+                {/* <span>{user?.displayName}</span> */}
+                <button onClick={handleLogOut} className="btn btn-ghost">LogOut</button>
+            </> : <>
+                <li><Link to="/login">Login</Link></li>
+            </>
+        }
+        
+        
   </div>
 </div>
     );

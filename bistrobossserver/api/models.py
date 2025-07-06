@@ -9,3 +9,15 @@ class menu(models.Model):
     price=models.DecimalField(max_digits=6,decimal_places=2)
     category=models.CharField(max_length=100)
 
+
+
+
+class Cart(models.Model):
+    menu_id = models.CharField(max_length=100)  # ID from frontend
+    name = models.CharField(max_length=200)
+    image = models.URLField()
+    price = models.DecimalField(max_digits=6, decimal_places=2)
+    email = models.EmailField()
+    added_at = models.DateTimeField(auto_now_add=True)
+
+   

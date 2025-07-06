@@ -1,8 +1,74 @@
+import { useContext } from "react";
+import { AuthContext } from "../AuthProvider/AuthProvider";
+import useAuth from "../../Hooks/useAuth";
+import Swal from "sweetalert2";
+import { useLocation, useNavigate } from "react-router-dom";
+import axios from "axios";
+
 
 
 
 const FoodCard = ({ item }) => {
-    const { name, image, price, recipe, _id } = item;
+    const { name, image, price, recipe, id } = item;
+    const {user}=useAuth()
+    const navigate=useNavigate()
+    const location=useLocation()
+    const from =location.state?.from?.pathname || '/'
+
+
+
+    const hendelAddToCart=(food)=>{
+        // console.log(food,user.email);
+        if(user&& user.email)
+        {
+            // ToDo :Send cart ite to the database 
+            // console.log(user.email,food);
+           const cartItem = {
+            menu_id: id,  // ✅ use snake_case to match Django model
+            email: user.email,
+            name,
+            image,
+            price,
+};
+
+            console.log(cartItem);
+
+            axios.post('http://127.0.0.1:8000/api/cart/',cartItem)
+            .then(res=>{
+                console.log(res.data)
+                if(res.data.insertedId){
+                    Swal.fire({
+                    position: "top-end",
+                    icon: "success",
+                    title: "You have add to cart",
+                    showConfirmButton: false,
+                    timer: 1500
+                    });
+
+                }
+            })
+        }
+        else
+        {
+            Swal.fire({
+  title: "You are not logged",
+  text: "Do you want to login",
+  icon: "warning",
+  showCancelButton: true,
+  confirmButtonColor: "#3085d6",
+  cancelButtonColor: "#d33",
+  confirmButtonText: "Yes, Login it!"
+}).then((result) => {
+  if (result.isConfirmed) {
+
+    navigate('/login',{state:{from:location}})
+   
+
+  }
+});
+        }
+            
+    }
  
 
 
@@ -17,6 +83,7 @@ const FoodCard = ({ item }) => {
                 <p>{recipe}</p>
                 <div className="card-actions justify-end">
                     <button
+                    onClick={()=>hendelAddToCart(item)}
                      
                         className="btn btn-outline bg-slate-100 border-0 border-b-4 border-orange-400 mt-4"
                     >Add to Cart</button>
