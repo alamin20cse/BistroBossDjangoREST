@@ -1,18 +1,18 @@
 from django.shortcuts import render
-from .models import menu
+
 
 from .serializers import menuSerializer,CartSerializer
 
 
 from rest_framework import mixins, viewsets, status
 from rest_framework.response import Response
-from .models import Cart
-from rest_framework.response import Response
+from .models import Cart,users,menu
+
 from rest_framework import status
 from rest_framework import mixins, viewsets, status
-from rest_framework.response import Response
-from .models import Cart
-from .serializers import CartSerializer
+
+
+from .serializers import CartSerializer,usersSerializer
 
 
 
@@ -87,3 +87,20 @@ class cartViewSet(
 
     def perform_destroy(self, instance):
         instance.delete()
+
+
+
+class viewUsersSet(viewsets.ModelViewSet):
+    queryset=users.objects.all()
+    serializer_class=usersSerializer
+
+    def destroy(self, request, *args, **kwargs):
+        instance = self.get_object()
+        instance.delete()
+        return Response({"deletedCount": 1}, status=status.HTTP_200_OK)
+
+    
+
+
+
+    

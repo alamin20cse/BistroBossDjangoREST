@@ -1,103 +1,84 @@
-import React, { useEffect, useState, createContext } from 'react';
+import { createContext, useEffect, useState } from "react";
+import { GoogleAuthProvider, createUserWithEmailAndPassword, getAuth, onAuthStateChanged, signInWithEmailAndPassword, signInWithPopup, signOut, updateProfile } from "firebase/auth";
 
-import {
-    createUserWithEmailAndPassword, // Corrected function name
-    onAuthStateChanged,
-    signInWithEmailAndPassword,
-    signInWithPopup,
-    signOut,
-    updateProfile as firebaseUpdateProfile, // Aliased to avoid conflicts
-    GoogleAuthProvider,
-} from "firebase/auth";
-import { auth } from '../firebase/firebase.config';
+import useAxiosPublic from "../../Hooks/useAxiosPublic";
+import { app } from "../../../../../../Project/Simple-Firebase/src/firebase/firebase.init";
 
-export const AuthContext = createContext();
+
+export const AuthContext = createContext(null);
+
+const auth = getAuth(app);
 
 const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null);
     const [loading, setLoading] = useState(true);
-
-    const createUser= async (email, password) => {
-        setLoading(true);
-        try {
-            return await createUserWithEmailAndPassword(auth , email, password);
-        } catch (error) {
-            console.error("Error creating new user:", error);
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    const logOut = async () => {
-        setLoading(true);
-        try {
-            return await signOut(auth);
-        } catch (error) {
-            console.error("Error logging out:", error);
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    const signIn= async (email, password) => {
-        setLoading(true);
-        try {
-            return await signInWithEmailAndPassword(auth, email, password);
-        } catch (error) {
-            console.error("Error logging in:", error);
-        } finally {
-            setLoading(false);
-        }
-    };
-
-   const updateUserProfile = async ({ displayName, photoURL }) => {
-    try {
-        await firebaseUpdateProfile(auth.currentUser, {
-            displayName: displayName,
-            photoURL: photoURL,
-        });
-        // Optional: Update local user state if needed
-        setUser((prevUser) => ({
-            ...prevUser,
-            displayName,
-            photoURL,
-        }));
-    } catch (error) {
-        console.error("Error updating profile:", error);
-    }
-};
-
-
     const googleProvider = new GoogleAuthProvider();
-    const handleGoogleSignIn = async () => {
-        try {
-            return await signInWithPopup(auth, googleProvider);
-        } catch (error) {
-            console.error("Error signing in with Google:", error);
+    const axiosPublic = useAxiosPublic();
+
+    const createUser = (email, password) => {
+        setLoading(true);
+        return createUserWithEmailAndPassword(auth, email, password)
+    }
+
+    const signIn = (email, password) => {
+        setLoading(true);
+        return signInWithEmailAndPassword(auth, email, password);
+    }
+
+    const googleSignIn = () => {
+        setLoading(true);
+        return signInWithPopup(auth, googleProvider);
+    }
+
+    const logOut = () => {
+        setLoading(true);
+        return signOut(auth);
+    }
+
+    const updateUserProfile = (name, photo) => {
+        return updateProfile(auth.currentUser, {
+            displayName: name, photoURL: photo
+        });
+    }
+
+    useEffect(() => {
+        const unsubscribe = onAuthStateChanged(auth, currentUser => {
+            setUser(currentUser);
+            if (currentUser) {
+                // get token and store client
+                // const userInfo = { email: currentUser.email };
+                // axiosPublic.post('/jwt', userInfo)
+                //     .then(res => {
+                //         if (res.data.token) {
+                //             localStorage.setItem('access-token', res.data.token);
+                //             setLoading(false);
+                //         }
+                //     })
+
+
+                setLoading(false)
+            }
+            else {
+                // TODO: remove token (if token stored in the client side: Local storage, caching, in memory)
+                // localStorage.removeItem('access-token');
+                setLoading(false);
+            }
+            
+        });
+        return () => {
+            return unsubscribe();
         }
-    };
+    }, [axiosPublic])
 
     const authInfo = {
         user,
-        setUser,
-        createUser,
-        logOut,
-        signIn,
         loading,
-        setLoading,
-        updateUserProfile, // Updated reference
-        handleGoogleSignIn,
-    };
-
-    useEffect(() => {
-        const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-            setUser(currentUser);
-            setLoading(false);
-        });
-        return () => {
-            unsubscribe();
-        };
-    }, []);
+        createUser,
+        signIn,
+        googleSignIn,
+        logOut,
+        updateUserProfile
+    }
 
     return (
         <AuthContext.Provider value={authInfo}>

@@ -20,4 +20,9 @@ class Cart(models.Model):
     email = models.EmailField()
     added_at = models.DateTimeField(auto_now_add=True)
 
+
+class users(models.Model):
+    name=models.CharField(max_length=200)
+    email = models.EmailField(unique=True)
+
    
