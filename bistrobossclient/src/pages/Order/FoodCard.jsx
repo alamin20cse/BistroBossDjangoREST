@@ -4,6 +4,7 @@ import useAuth from "../../Hooks/useAuth";
 import Swal from "sweetalert2";
 import { useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
+import useAxiosSecure from "../../Hooks/useAxiosSecure";
 
 
 
@@ -15,6 +16,7 @@ const FoodCard = ({ item }) => {
     const location=useLocation()
     const from =location.state?.from?.pathname || '/'
 
+    const axiosSecure=useAxiosSecure()
 
 
     const hendelAddToCart=(food)=>{
@@ -33,7 +35,24 @@ const FoodCard = ({ item }) => {
 
             console.log(cartItem);
 
-            axios.post('http://127.0.0.1:8000/api/cart/',cartItem)
+            // axios.post('http://127.0.0.1:8000/api/cart/',cartItem)
+            // .then(res=>{
+            //     console.log(res.data)
+            //     if(res.data.insertedId){
+            //         Swal.fire({
+            //         position: "top-end",
+            //         icon: "success",
+            //         title: "You have add to cart",
+            //         showConfirmButton: false,
+            //         timer: 1500
+            //         });
+
+            //     }
+            // })
+
+
+
+               axiosSecure.post('/api/cart/',cartItem)
             .then(res=>{
                 console.log(res.data)
                 if(res.data.insertedId){
@@ -47,6 +66,9 @@ const FoodCard = ({ item }) => {
 
                 }
             })
+
+
+
         }
         else
         {

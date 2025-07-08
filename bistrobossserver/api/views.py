@@ -10,7 +10,6 @@ from .models import Cart
 
 
 
-from .models import Cart
 # Create your views here.
 
 
@@ -19,14 +18,36 @@ class menuViewSet(viewsets.ModelViewSet):
     serializer_class=menuSerializer
     
 
+
+
 class cartViewSet(
     mixins.CreateModelMixin,     # POST
     mixins.ListModelMixin,       # GET (list)
     mixins.RetrieveModelMixin,   # GET (detail)
+    mixins.DestroyModelMixin,    # DELETE
+    mixins.UpdateModelMixin,     # PUT / PATCH (update)
     viewsets.GenericViewSet
 ):
     queryset = Cart.objects.all()
     serializer_class = CartSerializer
+
+
+
+
+
+
+
+
+
+
+
+    def get_queryset(self):
+        email = self.request.query_params.get('email')
+        if email:
+            return Cart.objects.filter( email=email)
+
+        return Cart.objects.none()
+
 
     def create(self, request, *args, **kwargs):
         serializer = CartSerializer(data=request.data)
@@ -37,3 +58,12 @@ class cartViewSet(
                 status=status.HTTP_201_CREATED
             )
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def destroy(self, request, *args, **kwargs):
+        instance = self.get_object()  # ডিলিট করার অবজেক্ট টা পাই
+        deleted_id = instance.id
+        self.perform_destroy(instance)  # ডিলিট অপারেশন
+        return Response(
+            {"deletedId": deleted_id},
+            status=status.HTTP_200_OK
+        )
