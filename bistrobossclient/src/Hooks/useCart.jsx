@@ -11,7 +11,7 @@ const useCart = () => {
 
     // transtack query
 
-    const {data:cart=[]}=useQuery({
+    const {refetch,data:cart=[]}=useQuery({
 
         // it shold be uniqe 
         queryKey:['cart',user?.email],
@@ -25,7 +25,7 @@ const useCart = () => {
 
     })
 
-    return [cart]
+    return [refetch,cart]
    
 
 
