@@ -31,22 +31,17 @@ class cartViewSet(
     queryset = Cart.objects.all()
     serializer_class = CartSerializer
 
-
-
-
-
-
-
-
-
-
-
     def get_queryset(self):
-        email = self.request.query_params.get('email')
-        if email:
-            return Cart.objects.filter( email=email)
-
-        return Cart.objects.none()
+        # Only filter by email for list action
+        if self.action == 'list':
+            email = self.request.query_params.get('email')
+            if email:
+                return Cart.objects.filter(email=email)
+            return Cart.objects.none()
+        
+        # For detail actions (retrieve, update, destroy), return all objects
+        # so items can be found by their ID
+        return Cart.objects.all()
 
 
     def create(self, request, *args, **kwargs):
