@@ -16,7 +16,7 @@ const AllUsers = () => {
     })
 
     const handleMakeAdmin = user =>{
-        axiosSecure.patch(`/users/admin/${user.id}`)
+        axiosSecure.patch(`/api/users/${user.id}/`)
         .then(res =>{
             console.log(res.data)
             if(res.data.modifiedCount > 0){

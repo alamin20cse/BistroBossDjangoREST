@@ -23,6 +23,9 @@ import {
 import Dashboard from "./pages/Dashboard/Dashboard";
 import Cart from "./pages/Dashboard/Cart";
 import AllUsers from "./pages/Dashboard/AllUsers";
+import AddItems from "./pages/AddItems";
+import ManageItems from "./pages/Dashboard/ManageItems/ManageItems";
+import UpdateItem from "./pages/Dashboard/UpdateItem/UpdateItem";
 const queryClient = new QueryClient()
 
 const router = createBrowserRouter([
@@ -56,14 +59,31 @@ const router = createBrowserRouter([
     path:"/dashboard",
     element:<Dashboard></Dashboard>,
     children:[
+
+      // user
       {
         path:'cart',
         element:<Cart></Cart>
 
       },
+
+      // admin
       {
         path:'users',
         element:<AllUsers></AllUsers>
+      },
+      {
+        path:'addItems',
+        element:<AddItems></AddItems>
+      },
+      {
+        path:"manageItems",
+        element:<ManageItems></ManageItems>
+      },
+      {
+        path:'updateItem/:id',
+        element:<UpdateItem></UpdateItem>,
+        loader:({params})=>fetch(`http://127.0.0.1:8000/api/menu/${params.id}`)
       }
     ]
   }

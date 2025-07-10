@@ -17,38 +17,36 @@ const SignUp = () => {
 
     const onSubmit = data => {
 
-        createUser(data.email, data.password)
-            .then(result => {
-                const loggedUser = result.user;
-                console.log(loggedUser);
-                updateUserProfile({ displayName: data.name, photoURL: data.photoURL })
+       createUser(data.email, data.password)
+    .then(result => {
+        const loggedUser = result.user;
+        console.log(loggedUser);
 
-                    .then(() => {
-                        // create user entry in the database
-                        const userInfo = {
-                            name: data.name,
-                            email: data.email
+        // ✅ FIXED: pass values, not object
+        updateUserProfile(data.name, data.photoURL)
+            .then(() => {
+                const userInfo = {
+                    name: data.name,
+                    email: data.email
+                };
+                axiosPublic.post('/api/users/', userInfo)
+                    .then(res => {
+                        if (res.data.insertedId) {
+                            reset();
+                            Swal.fire({
+                                position: 'top-end',
+                                icon: 'success',
+                                title: 'User created successfully.',
+                                showConfirmButton: false,
+                                timer: 1500
+                            });
+                            navigate('/');
                         }
-                        axiosPublic.post('/users', userInfo)
-                            .then(res => {
-                                if (res.data.insertedId) {
-                                    console.log('user added to the database')
-                                    reset();
-                                    Swal.fire({
-                                        position: 'top-end',
-                                        icon: 'success',
-                                        title: 'User created successfully.',
-                                        showConfirmButton: false,
-                                        timer: 1500
-                                    });
-                                    navigate('/');
-                                }
-                            })
-
-
-                    })
-                    .catch(error => console.log(error))
+                    });
             })
+            .catch(error => console.log(error));
+    });
+
     };
 
     return (

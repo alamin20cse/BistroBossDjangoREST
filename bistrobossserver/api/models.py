@@ -24,5 +24,6 @@ class Cart(models.Model):
 class users(models.Model):
     name=models.CharField(max_length=200)
     email = models.EmailField(unique=True)
+    role = models.CharField(max_length=50, default='user')  # default user, can be 'admin'
 
    

@@ -10,6 +10,13 @@ from .models import Cart,users,menu
 
 from rest_framework import status
 from rest_framework import mixins, viewsets, status
+# views.py
+
+from rest_framework.views import APIView
+
+
+from rest_framework_simplejwt.tokens import RefreshToken
+
 
 
 from .serializers import CartSerializer,usersSerializer
@@ -99,8 +106,38 @@ class viewUsersSet(viewsets.ModelViewSet):
         instance.delete()
         return Response({"deletedCount": 1}, status=status.HTTP_200_OK)
 
-    
+    def partial_update(self, request, *args, **kwargs):
+        instance = self.get_object()
 
+        # ধরলাম আপনি admin বানাতে চাইছেন
+        instance.role = 'admin'
+        instance.save()
+
+        return Response({
+            "message": f"{instance.name} is now admin.",
+            "modifiedCount": 1
+        }, status=status.HTTP_200_OK)
+
+
+
+
+
+class CustomJWTView(APIView):
+    def post(self, request):
+        email = request.data.get('email')
+
+        if not email:
+            return Response({"detail": "Email is required."}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Ensure the user exists in your DB
+        user, created = users.objects.get_or_create(email=email, defaults={"name": "Unnamed"})
+
+        # Generate token
+        refresh = RefreshToken.for_user(user)
+
+        return Response({
+            'token': str(refresh.access_token),
+        }, status=status.HTTP_200_OK)
 
 
     
