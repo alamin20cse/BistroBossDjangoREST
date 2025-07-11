@@ -13,7 +13,7 @@ from rest_framework import mixins, viewsets, status
 # views.py
 
 from rest_framework.views import APIView
-
+from rest_framework.response import Response
 
 from rest_framework_simplejwt.tokens import RefreshToken
 
@@ -140,4 +140,18 @@ class CustomJWTView(APIView):
         }, status=status.HTTP_200_OK)
 
 
-    
+
+
+class SingleUserByEmail(APIView):
+    def get(self, request):
+        email = request.query_params.get('email')
+
+        if not email:
+            return Response({"error": "Email is required"}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            user = users.objects.get(email=email)
+            serializer = usersSerializer(user)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        except users.DoesNotExist:
+            return Response({"error": "User not found"}, status=status.HTTP_404_NOT_FOUND)

@@ -23,8 +23,10 @@ const SocialLogin = () => {
             axiosPublic.post('/api/users/', userInfo)
             .then(res =>{
                 console.log(res.data);
-                navigate('/');
+                
             })
+
+            navigate('/');
         })
     }
 

@@ -26,6 +26,7 @@ import AllUsers from "./pages/Dashboard/AllUsers";
 import AddItems from "./pages/AddItems";
 import ManageItems from "./pages/Dashboard/ManageItems/ManageItems";
 import UpdateItem from "./pages/Dashboard/UpdateItem/UpdateItem";
+import Payment from "./pages/Dashboard/Payment/Payment";
 const queryClient = new QueryClient()
 
 const router = createBrowserRouter([
@@ -66,8 +67,13 @@ const router = createBrowserRouter([
         element:<Cart></Cart>
 
       },
+      {
+        path:'payment',
+        element:<Payment></Payment>
+      },
 
       // admin
+
       {
         path:'users',
         element:<AllUsers></AllUsers>
